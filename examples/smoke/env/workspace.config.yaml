@@ -1,0 +1,6 @@
+# Smoke example: no .env.tpl present, so opInjectEnv logs a skip and setup exits 0.
+project: smoke
+setup: [opInjectEnv]
+run:
+  command: echo hi
+  port: { from: 41234, span: 3 }
