@@ -22,26 +22,33 @@ Consumed as raw TypeScript by `tsx`/`bun` — no build step.
 
 ## The wrappers (byte-identical in every repo)
 
+Use the `.mts` extension — it's always ESM, so the wrappers work even in repos that
+are not `"type": "module"` (most app repos), where a plain `.ts` would be transformed
+as CJS and reject the top-level `await`.
+
 ```ts
-// env/setup.ts
+// env/setup.mts
 #!/usr/bin/env npx tsx
 import { runSetupFromConfig } from "@simon/workspace-env";
 process.exit(await runSetupFromConfig(import.meta.url));
 ```
 
 ```ts
-// env/run.ts
+// env/run.mts
 #!/usr/bin/env npx tsx
 import { runDevFromConfig } from "@simon/workspace-env";
 await runDevFromConfig(import.meta.url);
 ```
 
-Wire them in `.conductor/settings.toml` (committed):
+Wire them in `.conductor/settings.toml` (committed). The `setup` command installs
+deps first (a fresh workspace has no `node_modules` yet, so this is what fetches
+`@simon/workspace-env` before the wrapper imports it); use the project's package
+manager here (`pnpm install`, `bun install`, `npm install --legacy-peer-deps`, …):
 
 ```toml
 [scripts]
-setup = "npx tsx env/setup.ts"
-run   = "npx tsx env/run.ts"
+setup = "npm install && npx tsx env/setup.mts"
+run   = "npx tsx env/run.mts"
 run_mode = "concurrent"
 ```
 
