@@ -24,18 +24,20 @@ Consumed as raw TypeScript by `tsx`/`bun` — no build step.
 
 Use the `.mts` extension — it's always ESM, so the wrappers work even in repos that
 are not `"type": "module"` (most app repos), where a plain `.ts` would be transformed
-as CJS and reject the top-level `await`.
+as CJS and reject the top-level `await`. The `-S npx --yes tsx` shebang matters too: in
+a fresh worktree `tsx` isn't installed yet, and plain `npx tsx` hangs on an interactive
+install prompt — `--yes` auto-accepts it.
 
 ```ts
 // env/setup.mts
-#!/usr/bin/env npx tsx
+#!/usr/bin/env -S npx --yes tsx
 import { runSetupFromConfig } from "@simon/workspace-env";
 process.exit(await runSetupFromConfig(import.meta.url));
 ```
 
 ```ts
 // env/run.mts
-#!/usr/bin/env npx tsx
+#!/usr/bin/env -S npx --yes tsx
 import { runDevFromConfig } from "@simon/workspace-env";
 await runDevFromConfig(import.meta.url);
 ```
@@ -47,8 +49,8 @@ manager here (`pnpm install`, `bun install`, `npm install --legacy-peer-deps`, �
 
 ```toml
 [scripts]
-setup = "npm install && npx tsx env/setup.mts"
-run   = "npx tsx env/run.mts"
+setup = "npm install && npx --yes tsx env/setup.mts"
+run   = "npx --yes tsx env/run.mts"
 run_mode = "concurrent"
 ```
 
