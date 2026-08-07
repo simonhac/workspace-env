@@ -46,7 +46,7 @@ export function opInjectEnv(opts: Record<string, unknown>): Phase {
         : path.join(ctx.root, ".env.local");
 
       if (!fs.existsSync(tpl)) {
-        ctx.out.warn(".env.tpl not found — skipping env bootstrap");
+        ctx.out.warn(`${path.basename(tpl)} not found — skipping env bootstrap`);
         return;
       }
 
@@ -111,7 +111,9 @@ export function opInjectEnv(opts: Record<string, unknown>): Phase {
         ctx.fail("op inject failed");
         return;
       }
-      ctx.out.success(`Wrote .env.local from .env.tpl (1Password, via ${authSource})`);
+      ctx.out.success(
+        `Wrote ${path.basename(target)} from ${path.basename(tpl)} (1Password, via ${authSource})`,
+      );
     },
   };
 }
